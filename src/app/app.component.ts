@@ -63,6 +63,7 @@ export class AppComponent implements OnInit, AfterViewInit {
     this.http.get('https://api.ipify.org/?format=json').subscribe(
       (response: any) => {
         const ipAddress = response.ip;
+        document.getElementById('ipAddress')!.textContent = ipAddress;
         this.searchAddress(ipAddress);
       },
       (error: any) => {
@@ -70,6 +71,7 @@ export class AppComponent implements OnInit, AfterViewInit {
       }
     );
   }
+  
 
   searchAddress(inputValue: string): void {
     const address = inputValue.trim();
@@ -92,16 +94,22 @@ export class AppComponent implements OnInit, AfterViewInit {
     if (this.marker) {
       this.map?.removeLayer(this.marker);
     }
-
+  
     this.http.get<any>(`https://geo.ipify.org/api/v1?apiKey=${apiKey}&ipAddress=${ipAddress}`)
       .subscribe(data => {
-        const { lat, lng } = data.location;
+        console.log(data)
+        const { lat, lng, city, region, timezone } = data.location;
         this.addMarker(lat, lng);
-        this.map?.setView([lat, lng], 13); 
+        this.map?.setView([lat, lng], 13);
+        document.getElementById('location')!.textContent = `${city}, ${region}`;
+        document.getElementById('timezone')!.textContent = timezone;
+        document.getElementById('isp')!.textContent = data.isp;
       }, error => {
         console.log(error);
       });
   }
+  
+  
 
   searchDomain(domain: string): void {
     const apiKey = 'at_EuQH84lR2kOg0vEtZt31iAsdDDVXD';
